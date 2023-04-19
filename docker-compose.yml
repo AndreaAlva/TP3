@@ -1,0 +1,58 @@
+version: "3.0"
+services:
+  web-ui:
+    build: .
+    ports:
+      - "80:8888"
+    environment:
+      NEXT: ${WEB_NEXT}
+      NAMEC: ${WEB_NAME}
+      IPC: ${WEB_IP}
+    networks:
+      ds-net:
+        ipv4_address: 10.0.0.10
+    env_file:
+      - .env
+
+  app:
+    build: .
+    environment:
+      NEXT: ${APP_NEXT}
+      NAMEC: ${APP_NAME}
+      IPC: ${APP_IP}
+    networks:
+      ds-net:
+        ipv4_address: 10.0.0.11
+    env_file:
+      - .env
+
+  db:
+    build: .
+    environment:
+      NAMEC: ${DB_NAME}
+      IPC: ${DB_IP}
+    networks:
+      ds-net:
+        ipv4_address: 10.0.0.12
+    env_file:
+      - .env
+  
+  mqttserver:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - $PWD/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      ds-net:
+        ipv4_address: 10.0.0.5
+networks:
+    ds-net:
+      driver: bridge
+      ipam:
+        driver: default
+        config:
+          - subnet: 10.0.0.0/24
+  
+
+
